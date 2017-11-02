@@ -1,7 +1,39 @@
+#!/usr/bin/env ruby
 class Coffee
+  # option parser commands
+  require 'optparse'
+
+  options = {}
+  optparse = OptionParser.new do |opts|
+    # banner that lists options
+    opts.banner = "Usage: coffee.rb [options]"
+
+    opts.on( '-d', 'Run method "drank_at"') do |v|
+      options[:d] = true
+    end
+
+    opts.on( '-l', 'Run method "last_coffee"') do |v|
+      options[:l] = true
+    end
+    
+    opts.on( '-b', 'Run method "b"') do |v|
+      options[:b] = true
+    end
+
+    options[:verbose] = false
+    opts.on( '-v', '--verbose', 'Output more information' ) do
+      options[:verbose] = true
+    end
+
+    opts.on( '-h', '--help', 'Display this screen' ) do
+      puts opts
+      exit
+    end
+  end.parse!
+
   # @time is unix time, nice because it's in seconds and an integer
   @time = Time.now.to_i
-  @tmp_path = "/home/mine/workspace/practice/ruby/tmp_coffee"
+  @tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
   
   # writes the seconds integer into a file so it's somewhere
   def self.drank_at
@@ -38,13 +70,13 @@ class Coffee
     days = " #{remaining / 86400} day#{:s if remaining/86400 > 1 }, and"
     puts "Cup clean for#{days if remaining >= 86400} #{hms}"
   end
-end
 
-case ARGV[0]
-when "drank"
-  Coffee.drank_at
-when "last"
-  Coffee.last_coffee
-when "both"
-  Coffee.both
+  # these if options have to be after the method or else it fails to call
+  if options[:d]
+    self.drank_at
+  end
+  
+  if options[:l]
+    self.last_coffee
+  end
 end
