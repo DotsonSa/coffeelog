@@ -7,9 +7,11 @@
 
 ### Changes to implement
 
-1. longer history
-  * Keep 10 time stamps the tmp file
-  * Also, add various options for showing time stamps
+1. Make use of Marshal library
+  * To use it rather than File write and read
+  * To convert an array item into the tmp file
+  * Longer kept history of time stamps
 
-2. track coffee consumed in a day
-  * Compare time stamps and add up the amount consumed in a 24 hour period
+2. Break up last coffee method
+  * Take apart the strings and time math
+  * More modular for use of marshalizing and allows differnt methods easier creation/coding
