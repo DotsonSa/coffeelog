@@ -7,25 +7,24 @@ class Coffee
 
   options = {}
   optparse = OptionParser.new do |opts|
-    # banner that lists options
     opts.banner = "Usage: coffee.rb [options]"
 
-    opts.on( '-d', 'Run method "drank_at"') do |v|
+    opts.on( '-d', 'Run method "coffee_drink"') do |v|
       options[:d] = true
     end
 
-    opts.on( '-l', 'Run method "last_coffee"') do |v|
+    opts.on( '-l', 'Run method "coffee_last"') do |v|
       options[:l] = true
     end
     
-    opts.on( '-a', 'Run method "coffee_add"') do |v|
+    opts.on( '-c', 'Run method "tmp_clear"') do |v|
+      options[:c] = true
+    end
+
+    opts.on( '-a', 'Run method "coffee_all"') do |v|
       options[:a] = true
     end
 
-    opts.on( '-r', 'Run method "coffee_read"') do |v|
-      options[:r] = true
-    end
-    
     options[:verbose] = false
     opts.on( '-v', '--verbose', 'Output more information' ) do
       options[:verbose] = true
@@ -37,56 +36,77 @@ class Coffee
     end
   end.parse!
 
-  # @time is unix time, nice because it's in seconds and an integer
-  @time = Time.now.to_i
-  @tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
+  # @time is unix time, nice because it's in seconds and an integer, which makes it nice to change into a string or do math with
+  @@time = Time.now.to_i
+  @@tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
  
- # marshal module fun times
-  # write coffees to tmp file
-  # it marshals object first then writes
+  # writes an object to tmp file
+  # it marshals the object first then writes
+  # added the message because this is only used when adding a time stamp to it
   def tmp_write(obj)
-    print Marshal::load(Marshal::dump(obj))
-    File.open(@tmp_path, "w+") do |f|
-      f.print Marshal.dump(obj)
-    end
+    File.open(@@tmp_path, 'wb') {|f| f.write(Marshal.dump(obj))}
+    puts "Coffee time added"
   end
 
+  # more or less a reduction and makes the Marshal loading easier to read
+  # also don't have to write it out so much even with only one line, less chance for a bug
   def tmp_read
-    File.open(@tmp_path) do |f|
-      @coffees = Marshal.load(f)
+    Marshal.load(File.binread(@@tmp_path))
+  end
+
+  # clears out the tmp file while also writing one item to it so it's not completely empty
+  def tmp_clear
+    coffees = []
+    coffees << @@time
+    puts "Coffee file cleared"
+    # to clear out tmp file
+    File.open(@@tmp_path, 'w') {}
+    tmp_write(coffees)
+  end
+
+  # checks for the amount of items in the array then removes the oldest until there's only 2
+  # then it adds a third item into the array
+  def coffee_drink
+    coffees = tmp_read
+
+    coffees << @@time
+
+    #Limiter for tmp array length
+    #change limit to change the number of total items allowed in the array
+    limit = 3
+    if coffees.length > limit
+      until coffees.length <= limit
+	coffees.shift
+      end
     end
+
+    tmp_write(coffees)
   end
 
-  def coffee_add
-    # Limiter for tmp array length
-    #if coffees.length > 3 
-    #  coffees.shift
-    #end
-    coffees = [1]
-    coffees << Time.now.to_i
-    Coffee.new.tmp_write(coffees)
+  # reads tmp file and then prints out message method with selected array item
+  def coffee_last
+    coffees = tmp_read
+    Coffee.message(coffees.last)
   end
 
-  def coffee_read
-    t = File.open(@tmp_path).read
-    coffees = time_load(t)
+  # reads out all items within the tmp array
+  def coffee_all
+    coffees = tmp_read
 
-  end
-
-  # writes the seconds integer into a file so it's somewhere
-  def self.drank_at
-    File.open(@tmp_path, "w+") do |f|
-      f.write @time
+    # iterates over the tmp array and writes out each time stamp
+    coffees.each do |coffee|
+      Coffee.message(coffee)
     end
-    puts "Coffee cup cleaned out"
   end
   
   # reads the file with the integer and takes the current time integer and subtracts for
   # the seconds between the two, the time since the drank_at command was entered
-  def self.last_coffee
-    t = File.open(@tmp_path).read.to_i
-    remaining = @time - t
-
+  def self.message(time)
+    # time being an integer object that is already a unix time stamp
+    # then the current time is taken away from the time stamp
+    remaining = @@time - time
+    
+    # here math is being done to figure out what amount of time it has been since the given time stamp
     # array of hours and minutes is made from dividing out seconds with a modulo for minutes
     hms = [remaining / 3600 % 24, remaining / 60 % 60]
 
@@ -98,36 +118,25 @@ class Coffee
     # so when it's just 1 minute there's no pluralization
     hms = ("#{hms[1].to_s} minute#{:s if hms[1] != 1} now" if hms[0] === 0) || ("#{hms} hours now")
 
-    # for replacing the zero minute where remaining isn't over a minute yet, just don't 
-    # want it to display 0 minutes now, and not sure how to place a string in a conditional
-    not_long = "not long now"
-    
     # day in seconds = 86400 and it displays days passed if any 
     days = " #{remaining / 86400} day#{:s if remaining/86400 > 1 }, and"
     puts "Cup clean for#{days if remaining >= 86400} #{hms}"
   end
 
-  # breaking up last_coffee
-  def time_message
-
-  end
-
   # these if options have to be after the method or else it fails to call
   if options[:d]
-    # last coffee ran here before drank
-    self.last_coffee
-    self.drank_at
+    Coffee.new.coffee_drink
   end
   
-  if options[:l]
-    self.last_coffee
-  end
-
   if options[:a]
-    Coffee.coffee_add
+    Coffee.new.coffee_all
   end
 
-  if options[:r]
-    Coffee.coffee_read
+  if options[:l]
+    Coffee.new.coffee_last
+  end
+
+  if options[:c]
+    Coffee.new.tmp_clear
   end
 end
