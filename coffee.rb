@@ -3,6 +3,8 @@ class Coffee
   # option parser commands
   require 'optparse'
 
+  ARGV << '-l' if ARGV.empty?
+
   options = {}
   optparse = OptionParser.new do |opts|
     # banner that lists options
@@ -16,10 +18,14 @@ class Coffee
       options[:l] = true
     end
     
-    opts.on( '-b', 'Run method "b"') do |v|
-      options[:b] = true
+    opts.on( '-a', 'Run method "coffee_add"') do |v|
+      options[:a] = true
     end
 
+    opts.on( '-r', 'Run method "coffee_read"') do |v|
+      options[:r] = true
+    end
+    
     options[:verbose] = false
     opts.on( '-v', '--verbose', 'Output more information' ) do
       options[:verbose] = true
@@ -34,11 +40,41 @@ class Coffee
   # @time is unix time, nice because it's in seconds and an integer
   @time = Time.now.to_i
   @tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
-  
+ 
+ # marshal module fun times
+  # write coffees to tmp file
+  # it marshals object first then writes
+  def tmp_write(obj)
+    print Marshal::load(Marshal::dump(obj))
+    File.open(@tmp_path, "w+") do |f|
+      f.print Marshal.dump(obj)
+    end
+  end
+
+  def tmp_read
+    File.open(@tmp_path) do |f|
+      @coffees = Marshal.load(f)
+    end
+  end
+
+  def coffee_add
+    # Limiter for tmp array length
+    #if coffees.length > 3 
+    #  coffees.shift
+    #end
+    coffees = [1]
+    coffees << Time.now.to_i
+    Coffee.new.tmp_write(coffees)
+  end
+
+  def coffee_read
+    t = File.open(@tmp_path).read
+    coffees = time_load(t)
+
+  end
+
   # writes the seconds integer into a file so it's somewhere
   def self.drank_at
-    # simply to show last coffee
-    self.last_coffee
     File.open(@tmp_path, "w+") do |f|
       f.write @time
     end
@@ -71,12 +107,27 @@ class Coffee
     puts "Cup clean for#{days if remaining >= 86400} #{hms}"
   end
 
+  # breaking up last_coffee
+  def time_message
+
+  end
+
   # these if options have to be after the method or else it fails to call
   if options[:d]
+    # last coffee ran here before drank
+    self.last_coffee
     self.drank_at
   end
   
   if options[:l]
     self.last_coffee
+  end
+
+  if options[:a]
+    Coffee.coffee_add
+  end
+
+  if options[:r]
+    Coffee.coffee_read
   end
 end
