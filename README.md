@@ -2,16 +2,13 @@
 
 ## Not for timing coffee, but it's consumption
 
-  Two methods for listing time since last coffee entry/drinking, with the other just being coffee drank/entered as the time stamp. 
-  It marks down the time when the drank command is entered as a unix time stamp, and reads it out. Currently only supports one time stamp.
+  It marks down the time and puts it an array, where it's stored in an external file. Then it's able to be read the time stamps inside the array, and output it in a message.
+  There's a built in limiter to the amount of time stamps inside the array, and it's the number set by the limiter variable inside the coffee drink method. 
+  A host of options is available, and more to be added for doing math on the array to check for coffee drank in the past history.
+  Automatically lists last coffee logged when ran with no option instead of the usual help option.
 
 ### Changes to implement
 
-1. Make use of Marshal library
-  * To use it rather than File write and read
-  * To convert an array item into the tmp file
-  * Longer kept history of time stamps
-
-2. Break up last coffee method
-  * Take apart the strings and time math
-  * More modular for use of marshalizing and allows differnt methods easier creation/coding
+1. Math function to check for 24 hour past coffee
+  * Perform math on the array for checking items that have been added within the past 24 hours
+  * Return the value in a neat message
