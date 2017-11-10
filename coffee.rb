@@ -73,7 +73,7 @@ class Coffee
 
     #Limiter for tmp array length
     #change limit to change the number of total items allowed in the array
-    limit = 3
+    limit = 10
     if coffees.length > limit
       until coffees.length <= limit
 	coffees.shift
