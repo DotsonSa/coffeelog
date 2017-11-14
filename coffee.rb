@@ -25,6 +25,14 @@ class Coffee
       options[:a] = true
     end
 
+    opts.on( '--all-dates', 'Run method "coffee_date_all"') do |v|
+      options[:all] = true
+    end
+
+    opts.on( '-p', 'Run method "coffee_past_day"') do |v|
+      options[:p] = true
+    end
+
     options[:verbose] = false
     opts.on( '-v', '--verbose', 'Output more information' ) do
       options[:verbose] = true
@@ -36,11 +44,10 @@ class Coffee
     end
   end.parse!
 
-  # @time is unix time, nice because it's in seconds and an integer, which makes it nice to change into a string or do math with
+  # @time is unix time, it's in seconds and an integer which makes it nice to change into a string or do math with
   @@time = Time.now.to_i
   @@tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
  
-  # writes an object to tmp file
   # it marshals the object first then writes
   # added the message because this is only used when adding a time stamp to it
   def tmp_write(obj)
@@ -59,20 +66,16 @@ class Coffee
     coffees = []
     coffees << @@time
     puts "Coffee file cleared"
-    # to clear out tmp file
     File.open(@@tmp_path, 'w') {}
     tmp_write(coffees)
   end
 
-  # checks for the amount of items in the array then removes the oldest until there's only 2
-  # then it adds a third item into the array
   def coffee_drink
     coffees = tmp_read
 
     coffees << @@time
 
     #Limiter for tmp array length
-    #change limit to change the number of total items allowed in the array
     limit = 10
     if coffees.length > limit
       until coffees.length <= limit
@@ -83,27 +86,39 @@ class Coffee
     tmp_write(coffees)
   end
 
-  # reads tmp file and then prints out message method with selected array item
   def coffee_last
     coffees = tmp_read
     Coffee.message(coffees.last)
   end
 
-  # reads out all items within the tmp array
+  def coffee_past_day
+    coffees = tmp_read
+    coffees.each do |coffee|
+      remaining = @@time - coffee
+      if remaining/86400 < 1
+	puts Coffee.message(coffee)
+      end
+    end
+  end
+
   def coffee_all
     coffees = tmp_read
 
-    # iterates over the tmp array and writes out each time stamp
     coffees.each do |coffee|
       Coffee.message(coffee)
     end
   end
+
+  def coffee_date_all
+    coffees = tmp_read
+
+    coffees.each do |coffee|
+      date = Time.at(coffee).strftime "%Y %B %d %H:%M:%S"
+      puts "Cup emptied on #{date}"
+    end
+  end
   
-  # reads the file with the integer and takes the current time integer and subtracts for
-  # the seconds between the two, the time since the drank_at command was entered
   def self.message(time)
-    # time being an integer object that is already a unix time stamp
-    # then the current time is taken away from the time stamp
     remaining = @@time - time
     
     # here math is being done to figure out what amount of time it has been since the given time stamp
@@ -130,6 +145,14 @@ class Coffee
   
   if options[:a]
     Coffee.new.coffee_all
+  end
+
+  if options[:all]
+    Coffee.new.coffee_date_all
+  end
+
+  if options[:p]
+    Coffee.new.coffee_past_day
   end
 
   if options[:l]
