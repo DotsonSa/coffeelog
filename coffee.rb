@@ -93,12 +93,21 @@ class Coffee
 
   def coffee_past_day
     coffees = tmp_read
+
+    i = 0
+
     coffees.each do |coffee|
       remaining = @@time - coffee
+
       if remaining/86400 < 1
 	puts Coffee.message(coffee)
+	i += 1	
       end
+
     end
+
+    puts "Cup#{:s if i == 1} in the past day: #{i}"
+
   end
 
   def coffee_all
