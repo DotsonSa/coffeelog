@@ -106,7 +106,7 @@ class Coffee
 
     end
 
-    puts "Cup#{:s if i == 1} in the past day: #{i}"
+    puts "Cup#{:s unless i == 1} in the past day: #{i}"
 
   end
 
