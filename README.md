@@ -9,18 +9,14 @@
 
 ### Changes to implement
 
-1. Math function to check for 24 hour past coffee
-  * Perform math on the array for checking items that have been added within the past 24 hours
-  * Return the value in a neat message
-
-2. Names
+1. Names
   * Change option naming and arguments
   * Change method names to reflect what the method does
   * Also, change the messages 
 
-3. Change tmp file into a log file
+2. Change tmp file into a log file
   * Need to look into the correct type, and local, of the log file
   * Change naming and also the location of tmp path class variable
 
-4. Read all time stamps in a date format
-  * Alike the read all time stamps method, -a, it reads the time stamps in a date format instead of 'time since coffee drank' message
+3. DRY Code
+  * Look through code after switching names
