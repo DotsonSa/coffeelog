@@ -45,13 +45,6 @@ class Coffee
   @@tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
   # more or less a reduction and makes the Marshal loading easier to read
   @@log_read = Marshal.load(File.binread(@@tmp_path))
- 
-  # it marshals the object first then writes
-  def coffee_write(obj)
-    File.open(@@tmp_path, 'wb') {|f| f.write(Marshal.dump(obj))}
-  # added the message because this is only used when adding a time stamp to it
-    puts "Coffee time added"
-  end
 
   def coffee_drink
     @@log_read << @@time
@@ -63,7 +56,8 @@ class Coffee
       end
     end
 
-    coffee_write(@@log_read)
+    File.open(@@tmp_path, 'wb') {|f| f.write(Marshal.dump(obj))}
+    puts "Coffee time added"
   end
 
   def coffee_last
@@ -83,7 +77,7 @@ class Coffee
 
     end
 
-    puts "Cup#{:s unless i == 1} in the past day: #{i}"
+    puts "#{i} Cup#{:s unless i == 1} in the past day"
 
   end
 
