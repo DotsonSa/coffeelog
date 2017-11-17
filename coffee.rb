@@ -17,10 +17,6 @@ class Coffee
       options[:l] = true
     end
     
-    opts.on( '-c', 'Run method "tmp_clear"') do |v|
-      options[:c] = true
-    end
-
     opts.on( '-a', 'Run method "coffee_all"') do |v|
       options[:a] = true
     end
@@ -47,31 +43,18 @@ class Coffee
   # @time is unix time, it's in seconds and an integer which makes it nice to change into a string or do math with
   @@time = Time.now.to_i
   @@tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
+  # more or less a reduction and makes the Marshal loading easier to read
+  @@log_read = Marshal.load(File.binread(@@tmp_path))
  
   # it marshals the object first then writes
-  # added the message because this is only used when adding a time stamp to it
-  def tmp_write(obj)
+  def coffee_write(obj)
     File.open(@@tmp_path, 'wb') {|f| f.write(Marshal.dump(obj))}
+  # added the message because this is only used when adding a time stamp to it
     puts "Coffee time added"
   end
 
-  # more or less a reduction and makes the Marshal loading easier to read
-  # also don't have to write it out so much even with only one line, less chance for a bug
-  def tmp_read
-    Marshal.load(File.binread(@@tmp_path))
-  end
-
-  # clears out the tmp file while also writing one item to it so it's not completely empty
-  def tmp_clear
-    coffees = []
-    coffees << @@time
-    puts "Coffee file cleared"
-    File.open(@@tmp_path, 'w') {}
-    tmp_write(coffees)
-  end
-
   def coffee_drink
-    coffees = tmp_read
+    coffees = @@log_read
 
     coffees << @@time
 
@@ -83,16 +66,16 @@ class Coffee
       end
     end
 
-    tmp_write(coffees)
+    coffee_write(coffees)
   end
 
   def coffee_last
-    coffees = tmp_read
+    coffees = @@log_read
     Coffee.message(coffees.last)
   end
 
   def coffee_past_day
-    coffees = tmp_read
+    coffees = @@log_read
 
     i = 0
 
@@ -111,7 +94,7 @@ class Coffee
   end
 
   def coffee_all
-    coffees = tmp_read
+    coffees = @@log_read
 
     coffees.each do |coffee|
       Coffee.message(coffee)
@@ -119,7 +102,7 @@ class Coffee
   end
 
   def coffee_date_all
-    coffees = tmp_read
+    coffees = @@log_read
 
     coffees.each do |coffee|
       date = Time.at(coffee).strftime "%Y %B %d %H:%M:%S"
@@ -166,9 +149,5 @@ class Coffee
 
   if options[:l]
     Coffee.new.coffee_last
-  end
-
-  if options[:c]
-    Coffee.new.tmp_clear
   end
 end
