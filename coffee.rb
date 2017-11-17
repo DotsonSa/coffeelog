@@ -54,32 +54,26 @@ class Coffee
   end
 
   def coffee_drink
-    coffees = @@log_read
+    @@log_read << @@time
 
-    coffees << @@time
-
-    #Limiter for tmp array length
     limit = 10
-    if coffees.length > limit
-      until coffees.length <= limit
-	coffees.shift
+    if @@log_read.length > limit
+      until @@log_read.length <= limit
+	@@log_read.shift
       end
     end
 
-    coffee_write(coffees)
+    coffee_write(@@log_read)
   end
 
   def coffee_last
-    coffees = @@log_read
-    Coffee.message(coffees.last)
+    Coffee.message(@@log_read.last)
   end
 
   def coffee_past_day
-    coffees = @@log_read
-
     i = 0
 
-    coffees.each do |coffee|
+    @@log_read.each do |coffee|
       remaining = @@time - coffee
 
       if remaining/86400 < 1
@@ -94,17 +88,13 @@ class Coffee
   end
 
   def coffee_all
-    coffees = @@log_read
-
-    coffees.each do |coffee|
+    @@log_read.each do |coffee|
       Coffee.message(coffee)
     end
   end
 
   def coffee_date_all
-    coffees = @@log_read
-
-    coffees.each do |coffee|
+    @@log_read.each do |coffee|
       date = Time.at(coffee).strftime "%Y %B %d %H:%M:%S"
       puts "Cup emptied on #{date}"
     end
