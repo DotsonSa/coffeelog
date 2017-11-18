@@ -44,12 +44,8 @@ class Coffee
   @@time = Time.now.to_i
   @@log_path = "/home/mine/workspace/practice/ruby/log/log_coffee"
   # more or less a reduction and makes the Marshal loading easier to read
-<<<<<<< HEAD
   # has to check for the path so it doesn't throw an error for trying to call this
   @@log_read = Marshal.load(File.read( "/home/mine/workspace/practice/ruby/log/log_coffee")) if File.exists?(@@log_path)
-=======
-  @@log_read = Marshal.load(File.binread(@@log_path))
->>>>>>> aa813e0b0485cf391c61c36621dd71edabbeb181
 
   def coffee_drink
     # checks for log file existance so problems don't arise from calling a non-existing file
