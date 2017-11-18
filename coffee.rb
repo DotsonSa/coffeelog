@@ -42,13 +42,12 @@ class Coffee
 
   # @time is unix time, it's in seconds and an integer which makes it nice to change into a string or do math with
   @@time = Time.now.to_i
-  @@tmp_path = "/home/mine/workspace/practice/ruby/tmp/tmp_coffee"
+  @@log_path = "/home/mine/workspace/practice/ruby/log/log_coffee"
   # more or less a reduction and makes the Marshal loading easier to read
-  @@log_read = Marshal.load(File.binread(@@tmp_path))
+  @@log_read = Marshal.load(File.binread( "/home/mine/workspace/practice/ruby/log/log_coffee"))
 
   def coffee_drink
     @@log_read << @@time
-
     limit = 10
     if @@log_read.length > limit
       until @@log_read.length <= limit
@@ -56,7 +55,7 @@ class Coffee
       end
     end
 
-    File.open(@@tmp_path, 'wb') {|f| f.write(Marshal.dump(obj))}
+    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(@@log_read))}
     puts "Coffee time added"
   end
 
