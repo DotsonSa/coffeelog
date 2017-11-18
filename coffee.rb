@@ -44,18 +44,25 @@ class Coffee
   @@time = Time.now.to_i
   @@log_path = "/home/mine/workspace/practice/ruby/log/log_coffee"
   # more or less a reduction and makes the Marshal loading easier to read
-  @@log_read = Marshal.load(File.binread( "/home/mine/workspace/practice/ruby/log/log_coffee"))
+  # has to check for the path so it doesn't throw an error for trying to call this
+  @@log_read = Marshal.load(File.read( "/home/mine/workspace/practice/ruby/log/log_coffee")) if File.exists?(@@log_path)
 
   def coffee_drink
-    @@log_read << @@time
+    # checks for log file existance so problems don't arise from calling a non-existing file
+    if File.exists?(@@log_path)
+      coffees = @@log_read
+    else
+      coffees = []
+    end
+    coffees << @@time
     limit = 10
-    if @@log_read.length > limit
-      until @@log_read.length <= limit
-	@@log_read.shift
+    if coffees.length > limit
+      until coffees.length <= limit
+	coffees.shift
       end
     end
 
-    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(@@log_read))}
+    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(coffees))}
     puts "Coffee time added"
   end
 
