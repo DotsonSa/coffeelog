@@ -62,11 +62,7 @@ class Coffee
       end
     end
 
-<<<<<<< HEAD
-    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(coffees))}
-=======
     File.open(@@log_path, 'wb') {|f| f.write(Marshal.dump(obj))}
->>>>>>> aa813e0b0485cf391c61c36621dd71edabbeb181
     puts "Coffee time added"
   end
 
