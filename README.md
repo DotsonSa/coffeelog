@@ -5,10 +5,22 @@
   Lists last coffee logged when ran with no option.
   For first runs, it's required to log one coffee of course, and by doing that it will create the file on the log path class variable.
 
+
   This script uses Marshal so it's best that this is used with the same ruby version every time it's ran, otherwise it's unable to read or write to the file.
   The version that was used to make this:
+
+
     ruby 2.3.3p222 (2016-11-21) [x86_64-linux-gnu]
 
 ### Changes to implement
 1. Class variables
   * Have them be unset compared to what's on my own computer
+
+2. Set up having multiple logs
+  * Various methods to create new logs and paths
+  * Method to either switch or set up options to read other time stamps/logs/files
+
+3. Set up config options
+  * For setting path/s
+  * Setting past coffee time
+  * Setting limiter in coffee write
