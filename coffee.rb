@@ -55,7 +55,7 @@ class Coffee
       coffees = []
     end
     coffees << @@time
-    limit = 10
+    limit = 15
     if coffees.length > limit
       until coffees.length <= limit
 	coffees.shift
@@ -115,9 +115,14 @@ class Coffee
     # so when it's just 1 minute there's no pluralization
     hms = ("#{hms[1].to_s} minute#{:s if hms[1] != 1} now" if hms[0] === 0) || ("#{hms} hours now")
 
+    # week in seconds = 604800
+    week = remaining/604800
+    weeks = " #{:a if week < 2}#{week if week >= 2} week#{:s if remaining/604800 > 1},"
+
     # day in seconds = 86400 and it displays days passed if any 
-    days = " #{remaining / 86400} day#{:s if remaining/86400 > 1 }, and"
-    puts "Cup clean for#{days if remaining >= 86400} #{hms}"
+    day = if remaining/86400 > 7 then (remaining-604800)/86400 else remaining/86400 end
+    days = " #{:a if day < 2 }#{day if day >= 2 } day#{:s if day > 1 }, and"
+    puts "Cup clean for#{weeks if remaining >= 604800}#{days if remaining >= 86400} #{hms}"
   end
 
   # these if options have to be after the method or else it fails to call
