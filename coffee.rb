@@ -119,10 +119,10 @@ class Coffee
     week = remaining/604800
     weeks = " #{:a if week < 2}#{week if week >= 2} week#{:s if remaining/604800 > 1},"
 
-    # day in seconds = 86400 and it displays days passed if any 
-    day = if remaining/86400 > 7 then (remaining-604800)/86400 else remaining/86400 end
+    # day in seconds = 86400 
+    day = if remaining/86400 >= 7 then (remaining-604800)/86400 else remaining/86400 end
     days = " #{:a if day < 2 }#{day if day >= 2 } day#{:s if day > 1 }, and"
-    puts "Cup clean for#{weeks if remaining >= 604800}#{days if remaining >= 86400} #{hms}"
+    puts "Cup clean for#{weeks if remaining >= 604800}#{days if day >= 1} #{hms}"
   end
 
   # these if options have to be after the method or else it fails to call
