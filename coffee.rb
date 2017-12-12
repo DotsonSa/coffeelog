@@ -91,6 +91,9 @@ class Coffee
     @@log_read.each do |coffee|
       Coffee.message(coffee)
     end
+    #@@log_read.each do |coffee|
+    #  Coffee.new.message_day_hms(coffee)
+    #end
   end
 
   def coffee_date_all
@@ -115,14 +118,33 @@ class Coffee
     # so when it's just 1 minute there's no pluralization
     hms = ("#{hms[1].to_s} minute#{:s if hms[1] != 1} now" if hms[0] === 0) || ("#{hms} hours now")
 
-    # week in seconds = 604800
-    week = remaining/604800
-    weeks = " #{:a if week < 2}#{week if week >= 2} week#{:s if remaining/604800 > 1},"
+    week = 0
+    day = remaining/86400
+    until day < 7
+      week += 1
+      day -= 7
+    end
 
+    comma = ","
+    conditional_and = " and"
+
+    days = " #{:a if day == 1 }#{day if day >= 2 } day#{:s if day > 1 }#{comma if week >= 1 && day >= 1}#{conditional_and if day >=1 || week >= 1}"
+    weeks = " #{:a if week == 1 }#{week if week >= 2 } week#{:s if week > 1 }#{comma if week >= 1 && day >= 1}#{conditional_and if day == 0}"
+    message = "#{weeks if week >= 1}#{days if day >= 1} #{hms}"
+
+    puts "Cup clean for#{message}"
+  end
+
+  # method for bug checking message time variables past days
+  def message_day_hms(time)
+    remaining = @@time - time
+    hms = [remaining / 3600 % 24, remaining / 60 % 60]
+    hms = hms.map { |t| t.to_s.rjust(2,'0') }.join(":") if hms[0] >= 1
+    hms = ("#{hms[1].to_s} minute#{:s if hms[1] != 1} now" if hms[0] === 0) || ("#{hms} hours now")
     # day in seconds = 86400 
-    day = if remaining/86400 >= 7 then (remaining-604800)/86400 else remaining/86400 end
-    days = " #{:a if day < 2 }#{day if day >= 2 } day#{:s if day > 1 }, and"
-    puts "Cup clean for#{weeks if remaining >= 604800}#{days if day >= 1} #{hms}"
+    day = remaining/86400
+    days = " #{:a if day < 2 }#{day if day >= 2 } day#{:s if day > 1 } and"
+    puts "Cup clean for#{days if day >= 1} #{hms}"
   end
 
   # these if options have to be after the method or else it fails to call
