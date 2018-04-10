@@ -1,44 +1,6 @@
 #!/usr/bin/env ruby
 class Coffee
-  # option parser commands
   require 'optparse'
-
-  ARGV << '-l' if ARGV.empty?
-
-  options = {}
-  optparse = OptionParser.new do |opts|
-    opts.banner = "Usage: coffee.rb [options]"
-
-    opts.on( '-d', 'Run method "coffee_drink"') do |v|
-      options[:d] = true
-    end
-
-    opts.on( '-l', 'Run method "coffee_last"') do |v|
-      options[:l] = true
-    end
-    
-    opts.on( '-a', 'Run method "coffee_all"') do |v|
-      options[:a] = true
-    end
-
-    opts.on( '--all-dates', 'Run method "coffee_date_all"') do |v|
-      options[:all] = true
-    end
-
-    opts.on( '-p', 'Run method "coffee_past_day"') do |v|
-      options[:p] = true
-    end
-
-    options[:verbose] = false
-    opts.on( '-v', '--verbose', 'Output more information' ) do
-      options[:verbose] = true
-    end
-
-    opts.on( '-h', '--help', 'Display this screen' ) do
-      puts opts
-      exit
-    end
-  end.parse!
 
   # @time is unix time, it's in seconds and an integer which makes it nice to change into a string or do math with
   @@time = Time.now.to_i
@@ -148,23 +110,16 @@ class Coffee
   end
 
   # these if options have to be after the method or else it fails to call
-  if options[:d]
-    Coffee.new.coffee_drink
-  end
-  
-  if options[:a]
-    Coffee.new.coffee_all
-  end
 
-  if options[:all]
-    Coffee.new.coffee_date_all
-  end
+  ARGV << '-l' if ARGV.empty?
+  ARGV.options do |opts|
+    opts.banner = "Usage: coffee.rb [options]"
 
-  if options[:p]
-    Coffee.new.coffee_past_day
-  end
-
-  if options[:l]
-    Coffee.new.coffee_last
+    opts.on("-l") { Coffee.new.coffee_last }
+    opts.on("-d") { Coffee.new.coffee_drink }
+    opts.on("-a") { Coffee.new.coffee_all }
+    opts.on("--all") { Coffee.new.coffee_date_all }
+    opts.on("-p") { Coffee.new.coffee_past_day }
+    opts.parse!
   end
 end
