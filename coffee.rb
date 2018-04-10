@@ -17,7 +17,7 @@ class Coffee
       coffees = []
     end
     coffees << @@time
-    limit = 15
+    limit = 20
     if coffees.length > limit
       until coffees.length <= limit
 	coffees.shift
@@ -26,6 +26,33 @@ class Coffee
 
     File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(coffees))}
     puts "Coffee time added"
+  end
+# commented out because I need to rewrite message/last because it won't read it correctly
+#  def coffee_old(hours)
+#    hour = @@time - (hours.to_i * 3600)
+#    if File.exists?(@@log_path)
+#      coffees = @@log_read
+#    else
+#      coffees = []
+#    end
+#    coffees << hour
+#    limit = 20
+#    if coffees.length > limit
+#      until coffees.length <= limit
+#	coffees.shift
+#      end
+#    end
+
+#    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(coffees))}
+#    puts "Old coffee added"
+#    puts @@time - hour
+#
+#  end
+
+  def coffee_remove
+    @@log_read.shift
+    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(@@log_read))}
+    puts "Coffee time removed"
   end
 
   def coffee_last
@@ -53,9 +80,6 @@ class Coffee
     @@log_read.each do |coffee|
       Coffee.message(coffee)
     end
-    #@@log_read.each do |coffee|
-    #  Coffee.new.message_day_hms(coffee)
-    #end
   end
 
   def coffee_date_all
@@ -117,6 +141,8 @@ class Coffee
 
     opts.on("-l") { Coffee.new.coffee_last }
     opts.on("-d") { Coffee.new.coffee_drink }
+    opts.on("--hours=val") { |val| Coffee.new.coffee_old(val) }
+    opts.on("-r") { Coffee.new.coffee_remove }
     opts.on("-a") { Coffee.new.coffee_all }
     opts.on("--all") { Coffee.new.coffee_date_all }
     opts.on("-p") { Coffee.new.coffee_past_day }
