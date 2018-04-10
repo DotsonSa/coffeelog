@@ -17,8 +17,8 @@ class Coffee
       coffees = []
     end
     coffees << @@time
-    limit = 20
-    if coffees.length > limit
+    limit = 0
+    if limit > 0
       until coffees.length <= limit
 	coffees.shift
       end
@@ -27,27 +27,25 @@ class Coffee
     File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(coffees))}
     puts "Coffee time added"
   end
-# commented out because I need to rewrite message/last because it won't read it correctly
-#  def coffee_old(hours)
-#    hour = @@time - (hours.to_i * 3600)
-#    if File.exists?(@@log_path)
-#      coffees = @@log_read
-#    else
-#      coffees = []
-#    end
-#    coffees << hour
-#    limit = 20
-#    if coffees.length > limit
-#      until coffees.length <= limit
-#	coffees.shift
-#      end
-#    end
 
-#    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(coffees))}
-#    puts "Old coffee added"
-#    puts @@time - hour
-#
-#  end
+  def coffee_old(hours)
+    hour = @@time - (hours.to_i * 3600)
+    if File.exists?(@@log_path)
+      coffees = @@log_read
+    else
+      coffees = []
+    end
+    coffees << hour
+    limit = 0
+    if limit > 0
+      until coffees.length <= limit
+	coffees.shift
+      end
+    end
+
+    File.open(@@log_path, 'w+') {|f| f.write(Marshal.dump(coffees))}
+    puts "Old coffee added"
+  end
 
   def coffee_remove
     @@log_read.shift
